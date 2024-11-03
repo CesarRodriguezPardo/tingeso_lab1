@@ -24,15 +24,11 @@ public class CreditEntity {
     private Long id;
 
     // Attributes related to the characteristics of the credit
-   private int requestedAmount;
-   private int requestedTerm;
-
-    // Attribute used to know if a credit is simulated or no
-    private boolean simulated;
-
-    // Attribute used to know if a credit is simulated or no
-    private boolean type;
-
+    private int requestedAmount;
+    private int requestedTerm;
+    private float interestRate;
+    private int status;
+    private int type;
     // Attribute related to the userId that the user requested
     private String rut;
 }

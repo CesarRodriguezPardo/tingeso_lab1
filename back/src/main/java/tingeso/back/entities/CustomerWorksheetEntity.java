@@ -27,4 +27,6 @@ public class CustomerWorksheetEntity {
     private Boolean independentJob;
     private int jobSeniority;
     private float salary;
+    private Boolean independentEvaluate;
+    private Boolean latePayment;
 }

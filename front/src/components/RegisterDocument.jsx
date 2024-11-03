@@ -1,127 +1,127 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomerService from '../services/customer.service';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+import DocumentService from '../services/document.service';
+import UserService from '../services/user.service';
+import { Paper, Grid, TextField, Button, Typography, CircularProgress, Alert } from '@mui/material';
 
-const RegisterFile = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-  });
-  const [files, setFiles] = useState({
-    file1: null,
-    file2: null,
-  });
-  const [message, setMessage] = useState('');
+const RegisterDocument = () => {
+  const [files, setFiles] = useState({});
+  const [message, setMessage] = useState({ text: '', type: 'info' });
+  const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const rut = localStorage.getItem('rut');
+      if (!rut) {
+        setMessage({ text: 'No RUT found. Please login again.', type: 'error' });
+        navigate('/login');
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await UserService.getIdByRut(rut);
+        setUserId(response.data);
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        setMessage({ text: 'Error retrieving user ID. Please try again.', type: 'error' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserId();
+  }, [navigate]);
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFiles((prevFiles) => ({
-      ...prevFiles,
-      [name]: files[0],
-    }));
+    setFiles((prevFiles) => ({ ...prevFiles, [name]: files[0] }));
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const uploadFiles = async () => {
+    if (!userId) {
+      setMessage({ text: 'User ID not found. Please login again.', type: 'error' });
+      return;
+    }
 
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-      formDataToSend.append(key, formData[key]);
-    });
-    formDataToSend.append('file1', files.file1);
-    formDataToSend.append('file2', files.file2);
+    setIsLoading(true);
+    setMessage({ text: '', type: 'info' });
 
     try {
-      const response = await CustomerService.saveApply(formDataToSend);
+      // Llamar al servicio para subir los documentos
+      await DocumentService.uploadCustomerDocs(userId, files.file1, files.file2);
 
-      if (response.status === 201) {
-        setMessage('Registration successful!');
-        navigate('/login');
+      // Verificar si los documentos se han subido correctamente
+      const isSavingUploadedResponse = await DocumentService.isSavingUploaded(userId);
+      const isWorksheetUploadedResponse = await DocumentService.isWorksheetUploaded(userId);
+
+      if (isSavingUploadedResponse.data && isWorksheetUploadedResponse.data) {
+        setMessage({ text: 'Documents uploaded successfully!', type: 'success' });
+        // Redireccionar a /home
+        navigate('/home');
+      } else {
+        setMessage({ text: 'Failed to upload documents. Please try again.', type: 'error' });
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      setMessage('Error during registration. Please check your details.');
+      console.error('Error uploading documents:', error);
+      setMessage({ text: 'An error occurred during upload.', type: 'error' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const paperStyle = {
-    padding: 20,
-    height: 'auto',
-    width: 350,
-    margin: '20px auto',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  };
-
   return (
-    <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
-      <Paper elevation={10} style={paperStyle}>
-        <Typography variant="h4" gutterBottom>
-          Register with Files
-        </Typography>
-
-        <form onSubmit={handleRegister} style={{ width: '100%' }}>         
+    <Paper elevation={3} style={{ padding: '20px', maxWidth: '600px', margin: '20px auto' }}>
+      <Typography variant="h6" gutterBottom>
+        Upload Documents
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
           <TextField
-            fullWidth
-            label="Upload File 1"
+            type="file"
             name="file1"
-            type="file"
             onChange={handleFileChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            required
-            margin="normal"
+            fullWidth
           />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
-            fullWidth
-            label="Upload File 2"
-            name="file2"
             type="file"
+            name="file2"
             onChange={handleFileChange}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            required
-            margin="normal"
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
             fullWidth
-            style={{ marginTop: '20px' }}
-            onClick={() => navigate("/home")}
-          >
-            Submit Files
-          </Button>
-        </form>
+          />
+        </Grid>
+        <Grid item xs={12}>
+  {isLoading ? (
+    <CircularProgress />
+  ) : (
+    <>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={uploadFiles} 
+        sx={{ mr: 1 }} // Margen a la derecha
+      >
+        Upload
+      </Button>
 
-        {message && (
-          <Typography variant="body2" color="error" style={{ marginTop: '20px' }}>
-            {message}
-          </Typography>
-        )}
-      </Paper>
-    </Grid>
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={() => navigate('/home')}
+        sx={{ ml: 1 }} // Margen a la izquierda
+      >
+        Upload without documents
+      </Button>
+    </>
+  )}
+</Grid>
+      </Grid>
+    </Paper>
   );
 };
 
-export default RegisterFile;
+export default RegisterDocument;

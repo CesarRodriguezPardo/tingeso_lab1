@@ -22,6 +22,12 @@ public class SavingAccountEntity {
     String rut;
     int seniority; // in years
     float balance;
+
+    float retiredCash;
+    float periodicDeposit;
+    float recentlyRetiredCash;
+
+
     int negativePoints = 0;
     int typeCapacity;
 }

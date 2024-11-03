@@ -2,19 +2,18 @@ package tingeso.back.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tingeso.back.entities.CustomerEntity;
 import tingeso.back.entities.CustomerWorksheetEntity;
-import tingeso.back.repositories.CustomerRepository;
+import tingeso.back.entities.UserEntity;
 import tingeso.back.repositories.CustomerWorksheetRepository;
+import tingeso.back.repositories.UserRepository;
 
 @Service
 public class EvaluateCreditService {
     @Autowired
-    CustomerRepository customerRepository;
+    UserRepository userRepository;
 
     @Autowired
     CustomerWorksheetRepository customerWorksheetRepository;
-
 
     public boolean R1feeAndIncomeRatio(float m, String rut){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
@@ -23,36 +22,29 @@ public class EvaluateCreditService {
         return ratio > 35;
     }
 
-    public boolean R2creditHistory(String rut,
-                                   boolean latePayment){
+    public boolean R2creditHistory(String rut){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
 
-
-        return (worksheetEntity.getDicom()) || (latePayment);
+        return worksheetEntity.getDicom() || worksheetEntity.getLatePayment();
     }
 
-    public boolean R3seniority(String rut, boolean independentEvaluate){
+    public boolean R3seniority(String rut){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
         if (worksheetEntity.getIndependentJob()){
-            return independentEvaluate;
+            return worksheetEntity.getIndependentEvaluate();
         }else{
             return (worksheetEntity.getJobSeniority() < 1);
         }
     }
 
-    public boolean R4debtIncome(String rut){
+    public boolean R4debtIncome(String rut, float newPayment){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
-        return (worksheetEntity.getTotalDebts() > (worksheetEntity.getSalary() / 2));
+        return ((worksheetEntity.getTotalDebts() + newPayment) > (worksheetEntity.getSalary() / 2));
     }
 
-        /*/
-    R5 es el monto maximo de financiamiento...
-     */
-
     public boolean R6maxAge(int n, String rut){
-        CustomerEntity customer = customerRepository.findByRut(rut);
-
-        return (customer.getAge() + n) > 70;
+        UserEntity user = userRepository.findByRut(rut);
+        return (user.getAge() + n) > 70;
     }
 
 }

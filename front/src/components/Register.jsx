@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomerService from '../services/customer.service';
+import CustomerService from '../services/user.service';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';  
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Input from '@mui/material/Input';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +19,7 @@ const Register = () => {
     phone: '',
     age: '',
   });
-  const [files, setFiles] = useState({
-    file1: null,
-    file2: null
-  });
+  
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -39,27 +33,38 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
+    console.log('Register button clicked!');
+  
     const formDataToSend = new FormData();
     Object.keys(formData).forEach((key) => {
       formDataToSend.append(key, formData[key]);
     });
-    formDataToSend.append('file1', files.file1);
-    formDataToSend.append('file2', files.file2);
-
+  
+    console.log('FormData to send:', Array.from(formDataToSend.entries()));
+  
     try {
       const response = await CustomerService.saveApply(formDataToSend);
-
-      if (response.status === 201) {
+      console.log('Response:', response);
+  
+      if (response.status === 200 || response.status === 201) {
+        const userId = response.data.id; // Asegúrate de que esto sea lo que devuelve tu API
         setMessage('Registration successful!');
-        navigate('/login'); // Navega a la página de login después del registro
+  
+        // Guardar el RUT en localStorage
+        localStorage.setItem('rut', formData.rut);
+  
+        navigate('/registerdocument', { state: { userId: userId } }); // Solo pasamos el ID del usuario
+      } else {
+        console.error('Unexpected response status:', response.status);
+        setMessage('Unexpected response from the server. Please try again.');
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration error:', error.response ? error.response.data : error.message);
       setMessage('Error during registration. Please check your details.');
     }
   };
-
+  
+  
   const paperStyle = {
     padding: 20,
     height: 'auto',
@@ -79,7 +84,7 @@ const Register = () => {
         </Typography>
         
         <form onSubmit={handleRegister} style={{ width: '100%' }}>
-        <TextField
+          <TextField
             fullWidth
             label="First Name"
             name="firstName"
@@ -167,7 +172,6 @@ const Register = () => {
             color="primary"
             fullWidth
             style={{ marginTop: '20px' }}
-            onClick={() => navigate("/registerdocument")}
           >
             Continue register
           </Button>

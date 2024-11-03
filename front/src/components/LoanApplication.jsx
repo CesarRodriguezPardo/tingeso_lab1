@@ -20,14 +20,24 @@ const LoanApplication = () => {
 
   // Datos ficticios de ejemplo
   const loanTypes = [
-    { type: 'First Home', interestRate: '5%', maxAmount: '80% property value', term: '30 years' },
-    { type: 'Second Home', interestRate: '6%', maxAmount: '70% property value', term: '20 years' },
-    { type: 'Commercial Property', interestRate: '7%', maxAmount: '60% property value', term: '25 years' },
-    { type: 'Remodeling', interestRate: '6%', maxAmount: '50% property value', term: '15 years' }
+    { type: 'First Home', interestRate: '5%', maxAmount: '80% property value', term: 30 },
+    { type: 'Second Home', interestRate: '6%', maxAmount: '70% property value', term: 20 },
+    { type: 'Commercial Property', interestRate: '7%', maxAmount: '60% property value', term: 25 },
+    { type: 'Remodeling', interestRate: '6%', maxAmount: '50% property value', term: 15 }
   ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validar si el valor es negativo
+    if (Number(value) < 0) {
+      alert('The value cannot be negative.');
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: '' // Vaciar el campo si el valor es negativo
+      }));
+      return;
+    }
 
     // Si cambia el tipo de crédito, actualiza las tasas de interés y otros detalles
     if (name === 'loanType') {
@@ -40,6 +50,21 @@ const LoanApplication = () => {
         requestedAmount: '', // Reiniciar monto solicitado
         requestedTerm: '' // Reiniciar tiempo solicitado
       });
+    } else if (name === 'requestedTerm') {
+      // Validar que el tiempo solicitado no exceda el máximo permitido
+      const maxTerm = formData.term;
+      if (Number(value) > maxTerm) {
+        alert(`The requested term cannot exceed the maximum term of ${maxTerm} years.`);
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: maxTerm
+        }));
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: value
+        }));
+      }
     } else {
       setFormData((prevData) => ({
         ...prevData,
@@ -51,8 +76,7 @@ const LoanApplication = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Aquí podrías agregar lógica para validar el monto y el tiempo solicitados
-    // Por ejemplo, asegurarte de que el monto no exceda el máximo permitido
+    // Lógica para validar el monto y el tiempo solicitados, si es necesario
 
     // Redirigir a la página de cálculos y pasar el estado
     navigate('/loancalculation', { state: formData });
@@ -104,7 +128,7 @@ const LoanApplication = () => {
                 <strong>Maximum Amount:</strong> {formData.maxAmount}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                <strong>Term:</strong> {formData.term}
+                <strong>Term:</strong> {formData.term} years
               </Typography>
             </div>
           )}
@@ -129,10 +153,11 @@ const LoanApplication = () => {
             fullWidth
             margin="normal"
             required
+            helperText={`Maximum term: ${formData.term} years`}
           />
 
           <Button
-            type="submit" // Asegúrate de que el tipo sea "submit"
+            type="submit"
             variant="contained"
             color="primary"
             fullWidth

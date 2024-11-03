@@ -14,17 +14,16 @@ export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado de autenticación
   const navigate = useNavigate(); 
 
-
   useEffect(() => {
     // Verificar si el usuario está autenticado
-    const customer = localStorage.getItem("customer");
-    if (customer) {
+    const user = localStorage.getItem("user"); // Cambiar a "user"
+    if (user) {
       setIsAuthenticated(true);
     }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("customer");
+    localStorage.removeItem("user"); // Cambiar a "user"
     setIsAuthenticated(false);
     navigate("/home");
   };

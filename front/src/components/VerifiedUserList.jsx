@@ -1,32 +1,30 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import customerService from "../services/customer.service";
+import { useNavigate } from "react-router-dom";
+import UserService from "../services/user.service";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import TableCell, { tableCellClasses } from "@mui/material/TableCell";
+import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import EditIcon from "@mui/icons-material/Edit";
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
-const CustomerList = () => {
-  const [customers, setCustomers] = useState([]);
-
+const VerifiedUserList = () => { // Cambio de nombre del componente
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   const init = () => {
-    customerService
-      .findByVerified(false)
+    UserService
+      .findByVerified(true) // Método para obtener usuarios verificados
       .then((response) => {
-        console.log("Mostrando listado de todos los empleados.", response.data);
-        setCustomers(response.data);
+        console.log("Mostrando listado de todos los usuarios verificados.", response.data);
+        setUsers(response.data);
       })
       .catch((error) => {
         console.log(
-          "Se ha producido un error al intentar mostrar listado de todos los empleados.",
+          "Se ha producido un error al intentar mostrar listado de usuarios verificados.",
           error
         );
       });
@@ -38,7 +36,7 @@ const CustomerList = () => {
 
   return (
     <TableContainer component={Paper}>
-    <br />
+      <br />
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
@@ -60,26 +58,24 @@ const CustomerList = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {customers.map((customer) => (
+          {users.map((user) => (
             <TableRow
-              key={customer.id}
+              key={user.id}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
-              <TableCell align="left">{customer.rut}</TableCell>
-              <TableCell align="left">{customer.firstName}</TableCell>
-              <TableCell align="right">{customer.email}</TableCell>
-              <TableCell align="right">{customer.phone}</TableCell>
+              <TableCell align="left">{user.rut}</TableCell>
+              <TableCell align="left">{user.firstName}</TableCell>
+              <TableCell align="right">{user.email}</TableCell>
+              <TableCell align="right">{user.phone}</TableCell>
               <TableCell align="right">
-      
                 <Button
                   variant="contained"
                   color="info"
                   size="small"
                   startIcon={<TaskAltIcon />}
-                  onClick={() => navigate(`/customer/customerprofile/${customer.id}`)}>
-                  Check Data
+                  onClick={() => navigate(`/setdata/${user.id}`)}>
+                  Set Data
                 </Button>
-
               </TableCell>
             </TableRow>
           ))}
@@ -89,4 +85,4 @@ const CustomerList = () => {
   );
 };
 
-export default CustomerList;
+export default VerifiedUserList;

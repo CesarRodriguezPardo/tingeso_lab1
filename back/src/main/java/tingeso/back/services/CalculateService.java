@@ -10,8 +10,10 @@ public class CalculateService {
     // r es la tasa de interes mensual
     // n es el numero total de pagos // plazo / 12 / 100
 
-    public float calculatePayment(float p, float r, float n){
+    public float calculatePayment(float p, float interest, float term){
         float result;
+        float r = (interest / 100) * 100;
+        float n = term * 12;
 
         float base = (float) Math.pow((1 + r), n);
 
@@ -23,7 +25,7 @@ public class CalculateService {
     public float calculateInsurance(float creditAmount, float n){
         float fireInsurance = (float) 20.000;
         float desgravamentInsurance = creditAmount * (float) 0.0003;
-        float desgravamentInsuranceMonthly = desgravamentInsurance * (n/12);
+        float desgravamentInsuranceMonthly = desgravamentInsurance * (n*12);
         return fireInsurance + desgravamentInsuranceMonthly;
     }
 

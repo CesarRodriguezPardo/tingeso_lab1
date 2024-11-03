@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CustomerService from '../services/customer.service'; // Asegúrate de tener tu servicio de cliente configurado
+import UserService from '../services/user.service';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -27,11 +27,13 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await CustomerService.login(formData);
+      const response = await UserService.login(formData.email, formData.password);
 
       if (response.status === 200) {
+        const user = response.data; // Obtén el usuario de la respuesta
+        localStorage.setItem("user", JSON.stringify(user)); // Guarda el usuario en localStorage
         setMessage('Login successful!');
-        navigate('/dashboard'); // Cambia la ruta a tu página principal o dashboard
+        navigate('/home'); 
       }
     } catch (error) {
       console.error('Login error:', error);

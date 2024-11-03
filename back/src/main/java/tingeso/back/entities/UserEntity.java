@@ -7,20 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table (name = "CustomerEntity")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "UserEntity")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 
-public class CustomerEntity {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false)
     private Long id;
 
-    // Attributes related to personal information
     private String firstName;
     private String middleName;
     private String firstSurname;
@@ -31,10 +28,6 @@ public class CustomerEntity {
     private String phone;
     private int age;
 
-    // Attributes related to the verification
-    private boolean verified;
-
-    // Attributes related to personal PDF information
-    // falta por subir lo que seria la planilla de trabajo y también
-    // la planilla de ahorros en PDF
+    private Boolean verified;
+    private int role; // 1 for customer, 2 for employee
 }

@@ -29,25 +29,26 @@ export default function Sidemenu({ open, toggleDrawer }) {
 
         <Divider />
 
-        <ListItemButton onClick={() => navigate("/profile")}>
-          <ListItemIcon>
-            <PeopleAltIcon />
-          </ListItemIcon>
-          <ListItemText primary="My Profile" />
-        </ListItemButton>
 
-        <ListItemButton onClick={() => navigate("/customer/accountrequest")}>
+        <ListItemButton onClick={() => navigate("/user/UserList")}>
           <ListItemIcon>
             <PeopleAltIcon />
           </ListItemIcon>
           <ListItemText primary="Account Request" />
         </ListItemButton>
 
-        <ListItemButton onClick={() => navigate("/customer/accountrequest")}>
+        <ListItemButton onClick={() => navigate("/user/verifieduserlist")}>
+          <ListItemIcon>
+            <PeopleAltIcon />
+          </ListItemIcon>
+          <ListItemText primary="Verified Accounts" />
+        </ListItemButton>
+
+        <ListItemButton onClick={() => navigate("/allcreditlist")}>
           <ListItemIcon>
             <AttachMoneyIcon />
           </ListItemIcon>
-          <ListItemText primary="Credit Request" />
+          <ListItemText primary="Requested Credits" />
         </ListItemButton>
 
         <ListItemButton onClick={() => navigate("/loanapplication")}>
@@ -57,12 +58,20 @@ export default function Sidemenu({ open, toggleDrawer }) {
           <ListItemText primary="Simulate Credit" />
         </ListItemButton>
 
-        <ListItemButton onClick={() => navigate("/customer/accountrequest")}>
+        <ListItemButton onClick={() => navigate("/loanrequest")}>
           <ListItemIcon>
             <AttachMoneyIcon />
           </ListItemIcon>
           <ListItemText primary="Request Credit" />
         </ListItemButton>
+
+        <ListItemButton onClick={() => navigate("/creditlist")}>
+          <ListItemIcon>
+            <AttachMoneyIcon />
+          </ListItemIcon>
+          <ListItemText primary="My requested Credits" />
+        </ListItemButton>
+
       </List>
     </Box>
   );
