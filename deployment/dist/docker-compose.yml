@@ -5,7 +5,7 @@ services:
     container_name: nginx-frontend-container
     restart: always
     ports:
-      - 8090:8090
+      - 8070:8070
     volumes:
       - ./frontend.conf:/etc/nginx/nginx.conf
     networks:
@@ -54,6 +54,8 @@ services:
       - 8091:8090
     environment:
       DB_HOST: mysql-container
+      DB_USERNAME: root
+      DB_PASSWORD: 10391039
     networks:
       - backend-network
     depends_on:
