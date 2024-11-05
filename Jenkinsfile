@@ -9,14 +9,14 @@ pipeline{
             steps{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/CesarRodriguezPardo/tingeso_lab1']])
                 dir("back"){
-                    bat "mvn clean install"
+                    sh "mvn clean install"
                 }
             }
         }
         stage("Test"){
             steps{
                 dir("back"){
-                    bat "mvn test"
+                    sh "mvn test"
                 }
             }
         }        
@@ -25,8 +25,8 @@ pipeline{
                 dir("back"){
                     script{
                          withDockerRegistry(credentialsId: 'docker-credentials'){
-                            bat "docker build -t cesarrodriguezpardo/prestabanco-backend ."
-                            bat "docker push cesarrodriguezpardo/prestabanco-backend"
+                            sh "docker build -t cesarrodriguezpardo/prestabanco-backend ."
+                            sh "docker push cesarrodriguezpardo/prestabanco-backend"
                         }
                     }                    
                 }
