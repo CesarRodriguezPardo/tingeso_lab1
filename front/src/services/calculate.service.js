@@ -16,5 +16,4 @@ const calculateTotal = (m, n, insurance, administration) => {
     return httpClient.get(`/api/v1/calculate/calculateTotal/${m}/${n}/${insurance}/${administration}`);
 };
 
-
 export default { calculatePayment , calculateInsurance , calculateAdministrationCost , calculateTotal }

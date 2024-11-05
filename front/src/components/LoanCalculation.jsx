@@ -27,22 +27,21 @@ const LoanCalculations = () => {
     } else {
       // Realizar cálculos una vez que se tienen los datos
       const calculateValues = async () => {
-        const p = parseFloat(interestRate.replace('%', '')) / 100; // Convertir el porcentaje a decimal
-        const n = requestedTerm; // Número de años
-        const amount = requestedAmount; // Monto solicitado
+        const p = requestedAmount;
+        const interest = interestRate; // Número de años
+        const term = requestedTerm; // Monto solicitado
 
         try {
+          console.log(p, interest, term)
           // Llamadas al servicio para calcular los diferentes costos
-          const paymentResponse = await LoanService.calculatePayment(p, amount, n);
-          setPayment(paymentResponse.data);
-
-          const insuranceResponse = await LoanService.calculateInsurance(amount, n);
+          const paymentResponse = await LoanService.calculatePayment(p, interest, term);
+          const insuranceResponse = await LoanService.calculateInsurance(p, term);
           setInsurance(insuranceResponse.data);
 
-          const administrationResponse = await LoanService.calculateAdministrationCost(amount);
+          const administrationResponse = await LoanService.calculateAdministrationCost(p);
           setAdministrationCost(administrationResponse.data);
 
-          const totalResponse = await LoanService.calculateTotal(paymentResponse.data, n, insuranceResponse.data, administrationResponse.data);
+          const totalResponse = await LoanService.calculateTotal(paymentResponse.data, term, insuranceResponse.data, administrationResponse.data);
           setTotalCost(totalResponse.data);
         } catch (error) {
           console.error('Error calculating values:', error);
@@ -82,16 +81,16 @@ const LoanCalculations = () => {
           <strong>Interest Rate:</strong> {interestRate}
         </Typography>
         <Typography variant="body1">
-          <strong>Monthly Payment:</strong> {payment ? payment.toFixed(2) : 'Calculating...'} USD
+          <strong>Monthly Payment:</strong> {payment} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Insurance:</strong> {insurance ? insurance.toFixed(2) : 'Calculating...'} USD
+          <strong>Insurance:</strong> {insurance ? insurance : 'Calculating...'} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Administration Cost:</strong> {administrationCost ? administrationCost.toFixed(2) : 'Calculating...'} USD
+          <strong>Administration Cost:</strong> {administrationCost ? administrationCost: 'Calculating...'} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Total Cost:</strong> {totalCost ? totalCost.toFixed(2) : 'Calculating...'} USD
+          <strong>Total Cost:</strong> {totalCost ? totalCost: 'Calculating...'} USD
         </Typography>
         <Button 
           variant="contained" 

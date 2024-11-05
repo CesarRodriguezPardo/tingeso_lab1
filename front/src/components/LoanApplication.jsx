@@ -20,10 +20,10 @@ const LoanApplication = () => {
 
   // Datos ficticios de ejemplo
   const loanTypes = [
-    { type: 'First Home', interestRate: '5%', maxAmount: '80% property value', term: 30 },
-    { type: 'Second Home', interestRate: '6%', maxAmount: '70% property value', term: 20 },
-    { type: 'Commercial Property', interestRate: '7%', maxAmount: '60% property value', term: 25 },
-    { type: 'Remodeling', interestRate: '6%', maxAmount: '50% property value', term: 15 }
+    { type: 'First Home', interestRate: 5, maxAmount: '80% property value', term: 30 },
+    { type: 'Second Home', interestRate: 6, maxAmount: '70% property value', term: 20 },
+    { type: 'Commercial Property', interestRate: 7, maxAmount: '60% property value', term: 25 },
+    { type: 'Remodeling', interestRate: 6, maxAmount: '50% property value', term: 15 }
   ];
 
   const handleChange = (e) => {
@@ -122,7 +122,7 @@ const LoanApplication = () => {
           {formData.loanType && (
             <div>
               <Typography variant="body1" gutterBottom>
-                <strong>Interest Rate:</strong> {formData.interestRate}
+                <strong>Interest Rate (%):</strong> {formData.interestRate}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 <strong>Maximum Amount:</strong> {formData.maxAmount}

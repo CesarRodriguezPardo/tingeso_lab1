@@ -12,7 +12,7 @@ public class CalculateService {
 
     public float calculatePayment(float p, float interest, float term){
         float result;
-        float r = (interest / 100) * 100;
+        float r = interest / 100;
         float n = term * 12;
 
         float base = (float) Math.pow((1 + r), n);
