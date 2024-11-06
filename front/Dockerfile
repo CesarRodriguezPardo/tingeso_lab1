@@ -1,4 +1,4 @@
-FROM nginx:stable-alpine
+FROM --platform=linux/amd64 nginx:stable-alpine
 COPY /dist /usr/share/nginx/html
 COPY /nginx/conf.d /etc/nginx/conf.d
 

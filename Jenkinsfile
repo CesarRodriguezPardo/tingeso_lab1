@@ -25,7 +25,7 @@ pipeline{
                 dir("back"){
                     script{
                          withDockerRegistry(credentialsId: 'docker-credentials'){
-                            sh "docker build -t cesarrodriguezpardo/prestabanco-backend ."
+                            sh "docker build --platform=linux/amd64 -t cesarrodriguezpardo/prestabanco-backend ."
                             sh "docker push cesarrodriguezpardo/prestabanco-backend"
                         }
                     }                    
