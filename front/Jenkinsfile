@@ -15,8 +15,8 @@ pipeline{
                 dir("front"){
                     script{
                          withDockerRegistry(credentialsId: 'docker-credentials'){
-                            sh "docker build --platform=linux/amd64 -t cesarrodriguezpardo/prestabanco-frontend ."
-                            sh "docker push cesarrodriguezpardo/prestabanco-frontend"
+                            sh "docker build --platform=linux/amd64 -t cesarrodriguezpardo/prestabanco-frontend:latest ."
+                            sh "docker push cesarrodriguezpardo/prestabanco-frontend:latest"
                         }
                     }                    
                 }
