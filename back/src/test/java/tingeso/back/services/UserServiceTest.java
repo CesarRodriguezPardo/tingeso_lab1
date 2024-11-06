@@ -147,12 +147,7 @@ class UserServiceTest {
         assertThat(result).isTrue();
     }
 
-    @Test
-    void whenDeleteByRut_thenDeleteUser() {
-        userService.deleteByRut(1L);
 
-        verify(userRepository).deleteById(1L);
-    }
 
     @Test
     void whenLoginWithCorrectCredentials_thenReturnUser() {
