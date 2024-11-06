@@ -34,7 +34,7 @@ export default function Sidemenu({ open, toggleDrawer }) {
           <ListItemIcon>
             <PeopleAltIcon />
           </ListItemIcon>
-          <ListItemText primary="Account Request" />
+          <ListItemText primary="HOLI Request" />
         </ListItemButton>
 
         <ListItemButton onClick={() => navigate("/user/verifieduserlist")}>
