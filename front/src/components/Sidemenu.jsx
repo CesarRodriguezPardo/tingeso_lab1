@@ -29,12 +29,11 @@ export default function Sidemenu({ open, toggleDrawer }) {
 
         <Divider />
 
-
         <ListItemButton onClick={() => navigate("/user/UserList")}>
           <ListItemIcon>
             <PeopleAltIcon />
           </ListItemIcon>
-          <ListItemText primary="Account Request" />
+          <ListItemText primary="HOLAQWE Request" />
         </ListItemButton>
 
         <ListItemButton onClick={() => navigate("/user/verifieduserlist")}>

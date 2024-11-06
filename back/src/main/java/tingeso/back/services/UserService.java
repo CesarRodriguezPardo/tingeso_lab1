@@ -73,7 +73,14 @@ public class UserService {
     }
 
     public void deleteByRut(Long id){
+
         userRepository.deleteById(id);
+        CustomerWorksheetEntity worksheetEntity = worksheetRepository.findById(id).get();
+        worksheetRepository.deleteById(worksheetEntity.getId());
+        SavingAccountEntity savingEntity = savingAccountRepository.findById(id).get();
+        savingAccountRepository.deleteById(savingEntity.getId());
+        DocumentEntity documentEntity = documentRepository.findById(id).get();
+        documentRepository.deleteById(documentEntity.getId());
     }
     public UserEntity login(String email, String password){
         return userRepository.findByEmailAndPassword(email, password);

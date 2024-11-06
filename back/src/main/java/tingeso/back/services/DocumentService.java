@@ -72,23 +72,6 @@ public class DocumentService {
         return documentEntity.getFinancialStatement() != null;
     }
 
-    public Boolean uploadDoc(String userId, MultipartFile doc) {
-        try {
-            DocumentEntity document = documentRepository.findByUserId(userId);
-            if (document == null) {
-                return false;
-            }
-
-            if (doc != null && !doc.isEmpty()) {
-                document.setSavingAccountFile(doc.getBytes());
-            }
-            documentRepository.save(document);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
     public Boolean uploadCustomerDocs(String userId, MultipartFile savingAccountFile, MultipartFile worksheetFile) {
         try {
             DocumentEntity document = documentRepository.findByUserId(userId);
