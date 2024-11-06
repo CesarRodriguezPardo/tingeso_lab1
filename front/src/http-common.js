@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const backendServer = import.meta.env.VITE_BACKEND_SERVER;
+const backendServer = "104.41.56.72";
 const backendPort = import.meta.env.VITE_BACKEND_PORT;
 
 //const backendServer = import.meta.env.VITE_BACKEND_SERVER;
