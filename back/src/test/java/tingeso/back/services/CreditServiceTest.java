@@ -258,4 +258,137 @@ class CreditServiceTest {
     }
 
 
+
+    @Test
+    void testSaveCredit_RejectedDueToFeeIncomeRatio() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(true);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to fee to income ratio", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
+    @Test
+    void testSaveCredit_RejectedDueToCreditHistory() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(false);
+        when(evaluateCreditService.R2creditHistory(anyString())).thenReturn(true);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to negative credit history", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
+    @Test
+    void testSaveCredit_RejectedDueToSeniority() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(false);
+        when(evaluateCreditService.R2creditHistory(anyString())).thenReturn(false);
+        when(evaluateCreditService.R3seniority(anyString())).thenReturn(true);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to lack of employment seniority", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
+    @Test
+    void testSaveCredit_RejectedDueToDebtIncomeRatio() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(false);
+        when(evaluateCreditService.R2creditHistory(anyString())).thenReturn(false);
+        when(evaluateCreditService.R3seniority(anyString())).thenReturn(false);
+        when(evaluateCreditService.R4debtIncome(anyString(), anyDouble())).thenReturn(true);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to debt to income ratio", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
+    @Test
+    void testSaveCredit_RejectedDueToMaxAge() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(false);
+        when(evaluateCreditService.R2creditHistory(anyString())).thenReturn(false);
+        when(evaluateCreditService.R3seniority(anyString())).thenReturn(false);
+        when(evaluateCreditService.R4debtIncome(anyString(), anyDouble())).thenReturn(false);
+        when(evaluateCreditService.R6maxAge(anyInt(), anyString())).thenReturn(true);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to maximum age for the requested term", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
+    @Test
+    void testSaveCredit_RejectedDueToSavingsAccount() {
+        CreditEntity credit = new CreditEntity();
+        credit.setRut("12345678-9");
+        credit.setRequestedAmount(10000);
+        credit.setInterestRate(5);
+        credit.setRequestedTerm(12);
+
+        when(calculateService.calculatePayment(anyDouble(), anyDouble(), anyInt())).thenReturn(500.0);
+        when(evaluateCreditService.R1feeAndIncomeRatio(anyDouble(), anyString())).thenReturn(false);
+        when(evaluateCreditService.R2creditHistory(anyString())).thenReturn(false);
+        when(evaluateCreditService.R3seniority(anyString())).thenReturn(false);
+        when(evaluateCreditService.R4debtIncome(anyString(), anyDouble())).thenReturn(false);
+        when(evaluateCreditService.R6maxAge(anyInt(), anyString())).thenReturn(false);
+
+        SavingAccountEntity savingAccount = new SavingAccountEntity();
+        savingAccount.setNegativePoints(1);
+        when(savingAccountService.findByRut(anyString())).thenReturn(savingAccount);
+
+        boolean result = creditService.saveCredit(credit);
+
+        assertTrue(result);
+        assertEquals("Rejected due to savings account evaluation", credit.getRejectedReason());
+        assertEquals(7, credit.getStatus());
+        verify(creditRepository, times(1)).save(credit);
+    }
+
 }
