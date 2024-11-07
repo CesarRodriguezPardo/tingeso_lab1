@@ -2,17 +2,22 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import CreditService from "../services/credit.service";
 import userService from "../services/user.service"; 
+import documentService from "../services/document.service"; 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-import documentService from "../services/document.service"; 
+import CalculationService from "../services/calculate.service"; // Asegúrate de importar los métodos de cálculo
 
 const CreditDetail = () => {
   const { id } = useParams();
   const [credit, setCredit] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [status, setStatus] = useState(credit?.status || null); // Estado para el status
+  const [status, setStatus] = useState(credit?.status || null);
+  const [payment, setPayment] = useState(null);
+  const [insurance, setInsurance] = useState(null);
+  const [administrationCost, setAdministrationCost] = useState(null);
+  const [totalCost, setTotalCost] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,9 +25,25 @@ const CreditDetail = () => {
       try {
         const response = await CreditService.getById(id);
         setCredit(response.data);
-        setStatus(response.data.status); // Inicializa el estado con el status actual
+        setStatus(response.data.status); 
         const userResponse = await userService.getIdByRut(response.data.rut);
         setUserId(userResponse);
+
+        // Obtener datos de cálculos después de obtener los detalles del crédito
+        const amount = response.data.requestedAmount;
+        const term = response.data.requestedTerm;
+        const interestRate = response.data.interestRate;
+
+        // Calcular cuota, seguro, costo de administración y costo total
+        const paymentResponse = await CalculationService.calculatePayment(interestRate, amount, term);
+        const insuranceResponse = await CalculationService.calculateInsurance(amount, term);
+        const administrationResponse = await CalculationService.calculateAdministrationCost(amount);
+        const totalResponse = await CalculationService.calculateTotal(paymentResponse.data, term, insuranceResponse.data, administrationResponse.data);
+
+        setPayment(paymentResponse.data);
+        setInsurance(insuranceResponse.data);
+        setAdministrationCost(administrationResponse.data);
+        setTotalCost(totalResponse.data);
 
       } catch (error) {
         console.error("Error al obtener los detalles del crédito:", error);
@@ -79,7 +100,7 @@ const CreditDetail = () => {
     4: ["incomeFile", "remodelingBudgetFile", "updatedAppraisalFile"]
   };
 
-  const fileTypesToDownload = fileNamesByType[credit.type] || []; // Obtiene los nombres de archivo según el tipo
+  const fileTypesToDownload = fileNamesByType[credit.type] || [];
 
   // Opciones de status
   const statusOptions = [
@@ -133,6 +154,17 @@ const CreditDetail = () => {
             </Button>
           ))}
         </div>
+
+        {/* Mostrar Cálculos */}
+        {payment && (
+          <div style={{ marginTop: "20px" }}>
+            <Typography variant="h6">Detalles Financieros</Typography>
+            <Typography variant="body1"><strong>Cuota Mensual:</strong> {payment}</Typography>
+            <Typography variant="body1"><strong>Seguro:</strong> {insurance}</Typography>
+            <Typography variant="body1"><strong>Costo de Administración:</strong> {administrationCost}</Typography>
+            <Typography variant="body1"><strong>Costo Total:</strong> {totalCost}</Typography>
+          </div>
+        )}
 
         <Button
           variant="contained"
