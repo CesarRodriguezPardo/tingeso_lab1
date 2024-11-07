@@ -24,9 +24,8 @@ const LoanApplication = () => {
     { type: 'First Home', interestRate: 5, maxAmount: '80% property value', term: 30, requiredFiles: ['income file', 'appraisal file', 'creditHistoryFile'] },
     { type: 'Second Home', interestRate: 6, maxAmount: '70% property value', term: 20, requiredFiles: ['income file', 'appraisalFile', 'creditHistoryFile', 'firstHomeFile'] },
     { type: 'Commercial Property', interestRate: 7, maxAmount: '60% property value', term: 25, requiredFiles: ['incomeFile', 'appraisalFile', 'businessPlanFile', 'financialStatement'] },
-    { type: 'Remodeling', interestRate: 6, maxAmount: '50% property value', term: 15, requiredFiles: ['incomeFile', 'remodelingBudgetFile', 'updatedAppraisalFile'] },
-    { type: 'Build a house', interestRate: 6, maxAmount: '50% property value', term: 15, requiredFiles: ['incomeFile', 'remodelingBudgetFile', 'updatedAppraisalFile'] }
-  ];
+    { type: 'Remodeling', interestRate: 6, maxAmount: '50% property value', term: 15, requiredFiles: ['incomeFile', 'remodelingBudgetFile', 'updatedAppraisalFile'] }
+    ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
