@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -279,4 +280,208 @@ class UserServiceTest {
         verify(savingAccountRepository).save(savingAccount);
     }
 
+    @Test
+    void whenFindByIdNotFound_thenReturnNull() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        UserEntity result = userService.findById(99L);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void whenSaveApplicationWithExistingRut_thenReturnFalse() {
+        when(userRepository.findByRut(user.getRut())).thenReturn(user);  // Simulamos que el rut ya existe.
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(null);
+
+        Boolean result = userService.saveApplication(user);
+
+        assertThat(result).isFalse();
+        verify(userRepository, never()).save(user);  // Verifica que no se guarda el usuario si el rut ya existe.
+    }
+
+    @Test
+    void whenSaveApplicationWithExistingEmail_thenReturnFalse() {
+        when(userRepository.findByRut(user.getRut())).thenReturn(null);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);  // Simulamos que el email ya existe.
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(null);
+
+        Boolean result = userService.saveApplication(user);
+
+        assertThat(result).isFalse();
+        verify(userRepository, never()).save(user);  // Verifica que no se guarda el usuario si el email ya existe.
+    }
+
+    @Test
+    void whenSaveApplicationWithExistingPhone_thenReturnFalse() {
+        when(userRepository.findByRut(user.getRut())).thenReturn(null);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(user);  // Simulamos que el teléfono ya existe.
+
+        Boolean result = userService.saveApplication(user);
+
+        assertThat(result).isFalse();
+        verify(userRepository, never()).save(user);  // Verifica que no se guarda el usuario si el teléfono ya existe.
+    }
+
+
+
+
+    @Test
+    void whenLoginWithIncorrectCredentials_thenReturnNull() {
+        when(userRepository.findByEmailAndPassword("test@example.com", "wrongpassword")).thenReturn(null);
+
+        UserEntity result = userService.login("test@example.com", "wrongpassword");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void whenFindByRutNotFound_thenReturnNull() {
+        when(userRepository.findByRut("11.222.333-4")).thenReturn(null);
+
+        UserEntity result = userService.findByRut("11.222.333-4");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void whenSaveApplicationWithUniqueRutEmailAndPhone_thenReturnTrue() {
+        when(userRepository.findByRut(user.getRut())).thenReturn(null);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(null);
+
+        Boolean result = userService.saveApplication(user);
+
+        assertThat(result).isTrue();
+        verify(userRepository).save(user);
+        verify(worksheetRepository).save(any(CustomerWorksheetEntity.class));
+        verify(savingAccountRepository).save(any(SavingAccountEntity.class));
+        verify(documentRepository).save(any(DocumentEntity.class));
+    }
+
+    @Test
+    void whenLoginWithNonExistentUser_thenReturnNull() {
+        when(userRepository.findByEmailAndPassword("nonexistent@example.com", "password")).thenReturn(null);
+
+        UserEntity result = userService.login("nonexistent@example.com", "password");
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void whenFindByVerified_thenInvokeRepositoryMethod() {
+        when(userRepository.findByVerified(true)).thenReturn(Arrays.asList(user));
+
+        List<UserEntity> result = userService.findByVerified(true);
+
+        assertThat(result).contains(user);
+        verify(userRepository).findByVerified(true);  // Verifica que se llama el método correctamente
+    }
+
+
+    @Test
+    void whenSaveApplicationWithDuplicateRutAndPhone_thenReturnFalse() {
+        when(userRepository.findByRut(user.getRut())).thenReturn(user);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(null);
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(user);  // Simulamos que el teléfono ya existe.
+
+        Boolean result = userService.saveApplication(user);
+
+        assertThat(result).isFalse();
+        verify(userRepository, never()).save(user);  // Verifica que no se guarda el usuario
+    }
+
+
+    @Test
+    void setSeniority_ShouldHandleNullAccount() {
+        // Arrange
+        String testRut = "12345678-9";
+        int newSeniority = 5;
+
+        when(savingAccountRepository.findByRut(testRut)).thenReturn(null);
+
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> {
+            userService.setSeniority(testRut, newSeniority);
+        });
+
+        verify(savingAccountRepository).findByRut(testRut);
+        verify(savingAccountRepository, never()).save(any());
+    }
+
+    @Test
+    void verifyCostumer_ShouldVerifyUser() {
+        // Arrange
+        UserEntity mockUser = new UserEntity();
+        mockUser.setRut("1234567820");
+        mockUser.setVerified(false);
+
+        when(userRepository.findByRut("1234567820")).thenReturn(mockUser);
+
+        // Act
+        userService.verifyCostumer("1234567820");
+
+        // Assert
+        verify(userRepository).findByRut("1234567820");
+        verify(userRepository).save(any(UserEntity.class));
+    }
+
+    @Test
+    void verifyCostumer_ShouldHandleNullUser() {
+        // Arrange
+        when(userRepository.findByRut("1234567820")).thenReturn(null);
+
+        // Act & Assert
+        assertThrows(NullPointerException.class, () -> {
+            userService.verifyCostumer("1234567820");
+        });
+
+        verify(userRepository).findByRut("1234567820");
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void getIdByRut_ShouldReturnNull_WhenUserNotFound() {
+        // Arrange
+        String testRut = "1234567820";
+        when(userRepository.findByRut(testRut)).thenReturn(null);
+
+        // Act
+        String result = userService.getIdByRut(testRut);
+
+        // Assert
+        assertNull(result);
+        verify(userRepository).findByRut(testRut);
+    }
+
+    @Test
+    void deleteByRut_ShouldDeleteAllRelatedEntities() {
+        // Arrange
+        Long testId = 1L;
+
+        CustomerWorksheetEntity worksheetEntity = new CustomerWorksheetEntity();
+        worksheetEntity.setId(testId);
+
+        SavingAccountEntity savingEntity = new SavingAccountEntity();
+        savingEntity.setId(testId);
+
+        DocumentEntity documentEntity = new DocumentEntity();
+        documentEntity.setId(testId);
+
+        // Configurar los mocks para retornar las entidades
+        when(worksheetRepository.findById(testId)).thenReturn(Optional.of(worksheetEntity));
+        when(savingAccountRepository.findById(testId)).thenReturn(Optional.of(savingEntity));
+        when(documentRepository.findById(testId)).thenReturn(Optional.of(documentEntity));
+
+        // Act
+        userService.deleteByRut(testId);
+
+        // Assert
+        verify(userRepository).deleteById(testId);
+        verify(worksheetRepository).deleteById(worksheetEntity.getId());
+        verify(savingAccountRepository).deleteById(savingEntity.getId());
+        verify(documentRepository).deleteById(documentEntity.getId());
+    }
 }

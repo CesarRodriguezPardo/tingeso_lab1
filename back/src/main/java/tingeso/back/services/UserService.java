@@ -13,6 +13,7 @@ import tingeso.back.repositories.SavingAccountRepository;
 import tingeso.back.repositories.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -32,7 +33,17 @@ public class UserService {
     public List<UserEntity> getAll(){
         return userRepository.findAll();
     }
-    public UserEntity findById(Long id){return userRepository.findById(id).get();}
+
+    public UserEntity findById(Long id) {
+        Optional<UserEntity> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            return userOptional.get(); // Si el usuario está presente, devolverlo
+        } else {
+            return null; // O manejar el caso de no encontrar el usuario, por ejemplo, devolviendo null o lanzando una excepción
+        }
+    }
+
+
     public UserEntity findByRut(String rut){
         return userRepository.findByRut(rut);
     }
@@ -45,7 +56,10 @@ public class UserService {
 
     public String getIdByRut(String rut){
         UserEntity user = userRepository.findByRut(rut);
-        return Long.toString(user.getId());
+        if (user != null){
+            return Long.toString(user.getId());
+        }
+        return null;
     }
 
     public Boolean saveApplication(UserEntity user){
@@ -82,6 +96,7 @@ public class UserService {
         DocumentEntity documentEntity = documentRepository.findById(id).get();
         documentRepository.deleteById(documentEntity.getId());
     }
+
     public UserEntity login(String email, String password){
         return userRepository.findByEmailAndPassword(email, password);
     }
@@ -167,4 +182,5 @@ public class UserService {
         costumer.setVerified(true);
         userRepository.save(costumer);
     }
+
 }

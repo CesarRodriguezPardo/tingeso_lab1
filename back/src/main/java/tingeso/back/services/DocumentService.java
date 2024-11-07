@@ -98,11 +98,9 @@ public class DocumentService {
                                          MultipartFile incomeFile,
                                          MultipartFile appraisalFile,
                                          MultipartFile creditHistoryFile) {
+        DocumentEntity document = documentRepository.findByUserId(userId);
+
         try {
-            DocumentEntity document = documentRepository.findByUserId(userId);
-            if (document == null) {
-                return false;
-            }
 
             if (incomeFile != null && !incomeFile.isEmpty()) {
                 document.setIncomeFile(incomeFile.getBytes());
@@ -128,12 +126,8 @@ public class DocumentService {
                                           MultipartFile appraisalFile,
                                           MultipartFile creditHistoryFile,
                                           MultipartFile firstHomeFile) {
+        DocumentEntity document = documentRepository.findByUserId(userId);
         try {
-            DocumentEntity document = documentRepository.findByUserId(userId);
-            if (document == null) {
-                return false;
-            }
-
             if (incomeFile != null && !incomeFile.isEmpty()) {
                 document.setIncomeFile(incomeFile.getBytes());
             }
@@ -162,11 +156,8 @@ public class DocumentService {
                                         MultipartFile incomeFile,
                                         MultipartFile appraisalFile,
                                         MultipartFile businessPlanFile) {
+        DocumentEntity document = documentRepository.findByUserId(userId);
         try {
-            DocumentEntity document = documentRepository.findByUserId(userId);
-            if (document == null) {
-                return false;
-            }
 
             if (financialStatement != null && !financialStatement.isEmpty()) {
                 document.setFinancialStatement(financialStatement.getBytes());
@@ -195,11 +186,9 @@ public class DocumentService {
                                         MultipartFile incomeFile,
                                         MultipartFile remodelingBudgetFile,
                                         MultipartFile updatedAppraisalFile) {
+        DocumentEntity document = documentRepository.findByUserId(userId);
+
         try {
-            DocumentEntity document = documentRepository.findByUserId(userId);
-            if (document == null) {
-                return false;
-            }
 
             if (incomeFile != null && !incomeFile.isEmpty()) {
                 document.setIncomeFile(incomeFile.getBytes());
