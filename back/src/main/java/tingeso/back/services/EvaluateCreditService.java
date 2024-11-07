@@ -15,10 +15,10 @@ public class EvaluateCreditService {
     @Autowired
     CustomerWorksheetRepository customerWorksheetRepository;
 
-    public boolean R1feeAndIncomeRatio(float m, String rut){
+    public boolean R1feeAndIncomeRatio(double m, String rut){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
 
-        float ratio = (m / worksheetEntity.getSalary()) * 100;
+        double ratio = (m / worksheetEntity.getSalary()) * 100;
         return ratio > 35;
     }
 
@@ -37,7 +37,7 @@ public class EvaluateCreditService {
         }
     }
 
-    public boolean R4debtIncome(String rut, float newPayment){
+    public boolean R4debtIncome(String rut, double newPayment){
         CustomerWorksheetEntity worksheetEntity = customerWorksheetRepository.findByRut(rut);
         return ((worksheetEntity.getTotalDebts() + newPayment) > (worksheetEntity.getSalary() / 2));
     }

@@ -32,9 +32,9 @@ const LoanCalculations = () => {
         const term = requestedTerm; // Monto solicitado
 
         try {
-          console.log(p, interest, term)
           // Llamadas al servicio para calcular los diferentes costos
           const paymentResponse = await LoanService.calculatePayment(p, interest, term);
+          setPayment(paymentResponse.data)
           const insuranceResponse = await LoanService.calculateInsurance(p, term);
           setInsurance(insuranceResponse.data);
 
@@ -62,6 +62,11 @@ const LoanCalculations = () => {
     );
   }
 
+  // Función para redondear a dos decimales
+  const formatCurrency = (value) => {
+    return value ? value.toFixed(2) : 'Calculating...';
+  };
+
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
       <Paper elevation={10} style={{ padding: '20px', width: '350px', textAlign: 'center' }}>
@@ -78,19 +83,19 @@ const LoanCalculations = () => {
           <strong>Requested Term:</strong> {requestedTerm} years
         </Typography>
         <Typography variant="body1">
-          <strong>Interest Rate:</strong> {interestRate}
+          <strong>Interest Rate:</strong> {interestRate}%
         </Typography>
         <Typography variant="body1">
-          <strong>Monthly Payment:</strong> {payment} USD
+          <strong>Monthly Payment:</strong> {formatCurrency(payment)} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Insurance:</strong> {insurance ? insurance : 'Calculating...'} USD
+          <strong>Insurance:</strong> {formatCurrency(insurance)} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Administration Cost:</strong> {administrationCost ? administrationCost: 'Calculating...'} USD
+          <strong>Administration Cost:</strong> {formatCurrency(administrationCost)} USD
         </Typography>
         <Typography variant="body1">
-          <strong>Total Cost:</strong> {totalCost ? totalCost: 'Calculating...'} USD
+          <strong>Total Cost:</strong> {formatCurrency(totalCost)} USD
         </Typography>
         <Button 
           variant="contained" 

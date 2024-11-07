@@ -38,7 +38,7 @@ public class CreditService {
     public Boolean saveCredit(CreditEntity credit){
         String rut = credit.getRut();
 
-        float monthlyPayment = calculateService.calculatePayment(credit.getRequestedAmount(),
+        double monthlyPayment = calculateService.calculatePayment(credit.getRequestedAmount(),
                 credit.getInterestRate(),
                 credit.getRequestedTerm());
 
