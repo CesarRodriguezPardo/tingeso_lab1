@@ -16,14 +16,15 @@ const LoanApplication = () => {
     requestedAmount: '', // Monto solicitado
     requestedTerm: '' // Tiempo solicitado
   });
+  const [requiredFiles, setRequiredFiles] = useState([]); // Para almacenar los archivos requeridos
   const navigate = useNavigate();
 
   // Datos ficticios de ejemplo
   const loanTypes = [
-    { type: 'First Home', interestRate: 5, maxAmount: '80% property value', term: 30 },
-    { type: 'Second Home', interestRate: 6, maxAmount: '70% property value', term: 20 },
-    { type: 'Commercial Property', interestRate: 7, maxAmount: '60% property value', term: 25 },
-    { type: 'Remodeling', interestRate: 6, maxAmount: '50% property value', term: 15 }
+    { type: 'First Home', interestRate: 5, maxAmount: '80% property value', term: 30, requiredFiles: ['income file', 'appraisal file', 'creditHistoryFile'] },
+    { type: 'Second Home', interestRate: 6, maxAmount: '70% property value', term: 20, requiredFiles: ['income file', 'appraisalFile', 'creditHistoryFile', 'firstHomeFile'] },
+    { type: 'Commercial Property', interestRate: 7, maxAmount: '60% property value', term: 25, requiredFiles: ['incomeFile', 'appraisalFile', 'businessPlanFile', 'financialStatement'] },
+    { type: 'Remodeling', interestRate: 6, maxAmount: '50% property value', term: 15, requiredFiles: ['incomeFile', 'remodelingBudgetFile', 'updatedAppraisalFile'] }
   ];
 
   const handleChange = (e) => {
@@ -39,7 +40,7 @@ const LoanApplication = () => {
       return;
     }
 
-    // Si cambia el tipo de crédito, actualiza las tasas de interés y otros detalles
+    // Si cambia el tipo de crédito, actualiza las tasas de interés, otros detalles y los archivos requeridos
     if (name === 'loanType') {
       const selectedLoan = loanTypes.find(loan => loan.type === value);
       setFormData({
@@ -50,6 +51,7 @@ const LoanApplication = () => {
         requestedAmount: '', // Reiniciar monto solicitado
         requestedTerm: '' // Reiniciar tiempo solicitado
       });
+      setRequiredFiles(selectedLoan.requiredFiles); // Actualizar los archivos requeridos
     } else if (name === 'requestedTerm') {
       // Validar que el tiempo solicitado no exceda el máximo permitido
       const maxTerm = formData.term;
@@ -129,6 +131,14 @@ const LoanApplication = () => {
               </Typography>
               <Typography variant="body1" gutterBottom>
                 <strong>Term:</strong> {formData.term} years
+              </Typography>
+              <Typography variant="body1" gutterBottom>
+                <strong>Required Documents:</strong>
+                <ul>
+                  {requiredFiles.map((file, index) => (
+                    <li key={index}>{file}</li>
+                  ))}
+                </ul>
               </Typography>
             </div>
           )}
