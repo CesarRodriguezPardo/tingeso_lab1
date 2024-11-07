@@ -97,7 +97,6 @@ public class CreditService {
     }
 
 
-
     public void setStatus(Long id, int status){
         CreditEntity credit = creditRepository.findById(id).get();
         credit.setStatus(status);
