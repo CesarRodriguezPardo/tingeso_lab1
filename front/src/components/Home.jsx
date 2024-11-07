@@ -1,14 +1,13 @@
 const Home = () => {
   return (
     <div>
-      <h1>PrestaBanco: Sistema Bancario de Créditos</h1>
+      <h1>PrestaBanco: Credit service</h1>
       <p>
-        PrestaBanco es una aplicación web para gestionar créditos. Esta aplicación ha sido desarrollada usando tecnologías como{" "}
-        <a href="https://spring.io/projects/spring-boot">Spring Boot</a> (para
-        el backend), <a href="https://reactjs.org/">React</a> (para el Frontend)
-        y <a href="https://www.mysql.com/products/community/">MySQL</a> (para la
-        base de datos).
-      </p>
+  PrestaBanco is a web application for managing loans. This application has been developed using technologies such as 
+  <a href="https://spring.io/projects/spring-boot">Spring Boot</a> (for the backend), 
+  <a href="https://reactjs.org/">React</a> (for the frontend), and 
+  <a href="https://www.mysql.com/products/community/">MySQL</a> (for the database).
+</p>
     </div>
     
   );
