@@ -12,7 +12,7 @@ import Button from "@mui/material/Button";
 
 // Mapeo de estado a descripciones
 const statusDescriptions = {
-  1: "Revisión inicial", // Añadido estado 1
+  1: "Revisión inicial",
   2: "Pendiente de documentación",
   3: "En evaluación",
   4: "Pre aprobada",
@@ -23,34 +23,37 @@ const statusDescriptions = {
   9: "En desembolso"
 };
 
-const CreditList = () => {
+const AllCreditList = () => {
   const [credits, setCredits] = useState([]);
+  const [rejectedReasons, setRejectedReasons] = useState({});  // Estado para almacenar las razones de rechazo
   const navigate = useNavigate();
 
-  // Función para obtener el RUT desde localStorage
-  const getRutFromLocalStorage = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    return user ? user.rut : null; // Asegúrate de que el objeto usuario tenga la propiedad 'rut'
-  };
-
   const init = () => {
-    const rut = getRutFromLocalStorage();
-    if (rut) {
-      CreditService
-        .findByRut(rut) // Método para obtener créditos por RUT
-        .then((response) => {
-          console.log("Mostrando listado de créditos solicitados.", response.data);
-          setCredits(response.data);
-        })
-        .catch((error) => {
-          console.log(
-            "Se ha producido un error al intentar mostrar listado de créditos solicitados.",
-            error
-          );
+    CreditService
+      .getAll() // Método para obtener todos los créditos
+      .then((response) => {
+        console.log("Mostrando listado de todos los créditos.", response.data);
+        setCredits(response.data);
+
+        // Obtener las razones de rechazo para cada crédito
+        response.data.forEach(credit => {
+          if (credit.status === 7) {  // Solo obtener la razón si el crédito está rechazado
+            CreditService.rejectedReason(credit.id)
+              .then((res) => {
+                setRejectedReasons(prevState => ({
+                  ...prevState,
+                  [credit.id]: res.data // Guardamos la razón con el ID del crédito
+                }));
+              })
+              .catch((error) => {
+                console.log("Error al obtener la razón de rechazo.", error);
+              });
+          }
         });
-    } else {
-      console.error("RUT no encontrado en localStorage.");
-    }
+      })
+      .catch((error) => {
+        console.log("Se ha producido un error al intentar mostrar listado de créditos.", error);
+      });
   };
 
   useEffect(() => {
@@ -79,6 +82,9 @@ const CreditList = () => {
               Status
             </TableCell>
             <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              Description
+            </TableCell>
+            <TableCell align="right" sx={{ fontWeight: "bold" }}>
               Action
             </TableCell>
           </TableRow>
@@ -97,11 +103,18 @@ const CreditList = () => {
                 {statusDescriptions[Number(credit.status)] || "Desconocido"} {/* Muestra la descripción del estado */}
               </TableCell>
               <TableCell align="right">
+                {credit.status === 7 && rejectedReasons[credit.id] ? (
+                  rejectedReasons[credit.id]  // Muestra la razón de rechazo si está disponible
+                ) : (
+                  "N/A"
+                )}
+              </TableCell>
+              <TableCell align="right">
                 <Button
                   variant="contained"
                   color="info"
                   size="small"
-                  onClick={() => navigate(`/creditdetail/${credit.id}`)}> {/* Navegar a la página de detalles del crédito */}
+                  onClick={() => navigate(`/creditdetail/${credit.id}`)}>
                   View Details
                 </Button>
               </TableCell>
@@ -113,4 +126,4 @@ const CreditList = () => {
   );
 };
 
-export default CreditList;
+export default AllCreditList;

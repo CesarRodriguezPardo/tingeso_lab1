@@ -42,29 +42,61 @@ public class CreditService {
                 credit.getInterestRate(),
                 credit.getRequestedTerm());
 
-        if ( (evaluateCreditService.R1feeAndIncomeRatio(monthlyPayment, rut)) ||
-                (evaluateCreditService.R2creditHistory(rut)) ||
-                (evaluateCreditService.R3seniority(rut)) ||
-                (evaluateCreditService.R4debtIncome(rut, monthlyPayment)) ||
-                (evaluateCreditService.R6maxAge(credit.getRequestedTerm(), rut))){
-            credit.setStatus(7);
+        // Evaluating credit conditions
+        if ( (evaluateCreditService.R1feeAndIncomeRatio(monthlyPayment, rut)) ) {
+            credit.setRejectedReason("Rejected due to fee to income ratio");
+            credit.setStatus(7);  // Rejected
             creditRepository.save(credit);
             return true;
         }
 
+        if ( (evaluateCreditService.R2creditHistory(rut)) ) {
+            credit.setRejectedReason("Rejected due to negative credit history");
+            credit.setStatus(7);  // Rejected
+            creditRepository.save(credit);
+            return true;
+        }
+
+        if ( (evaluateCreditService.R3seniority(rut)) ) {
+            credit.setRejectedReason("Rejected due to lack of employment seniority");
+            credit.setStatus(7);  // Rejected
+            creditRepository.save(credit);
+            return true;
+        }
+
+        if ( (evaluateCreditService.R4debtIncome(rut, monthlyPayment)) ) {
+            credit.setRejectedReason("Rejected due to debt to income ratio");
+            credit.setStatus(7);  // Rejected
+            creditRepository.save(credit);
+            return true;
+        }
+
+        if ( (evaluateCreditService.R6maxAge(credit.getRequestedTerm(), rut)) ) {
+            credit.setRejectedReason("Rejected due to maximum age for the requested term");
+            credit.setStatus(7);  // Rejected
+            creditRepository.save(credit);
+            return true;
+        }
+
+        // If the savings account has low negative points
         savingAccountService.rateEvaluation(rut);
         SavingAccountEntity savingAccount = savingAccountService.findByRut(rut);
 
         if (savingAccount.getNegativePoints() < 2){
-            credit.setStatus(7);
+            credit.setRejectedReason("Rejected due to savings account evaluation");
+            credit.setStatus(7);  // Rejected
             creditRepository.save(credit);
             return true;
         }
 
-        credit.setStatus(1);
+        // If not rejected, set status as pending
+        credit.setStatus(1);  // Pending
+        credit.setRejectedReason("Waiting evaluation.");
         creditRepository.save(credit);
         return true;
     }
+
+
 
     public void setStatus(Long id, int status){
         CreditEntity credit = creditRepository.findById(id).get();
@@ -76,5 +108,10 @@ public class CreditService {
         CreditEntity credit = creditRepository.findById(id).get();
         credit.setType(status);
         creditRepository.save(credit);
+    }
+
+    public String getRejectedReason(Long id){
+        CreditEntity credit = creditRepository.findById(id).get();
+        return credit.getRejectedReason();
     }
 }

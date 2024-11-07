@@ -29,6 +29,7 @@ public class CreditEntity {
     private float interestRate;
     private int status;
     private int type;
+    private String rejectedReason;
     // Attribute related to the userId that the user requested
     private String rut;
 }

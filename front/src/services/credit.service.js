@@ -24,4 +24,8 @@ const setType = (id, type) => {
     return httpClient.post(`/api/v1/credit/setType/${id}/${type}`);
 };
 
-export default { saveApply , findByRut , getAll , getById , setStatus , setType }
+const rejectedReason = (id) => {
+    return httpClient.get(`/api/v1/credit/getRejectedReason/${id}`);
+};
+
+export default { saveApply , findByRut , getAll , getById , setStatus , setType , rejectedReason}

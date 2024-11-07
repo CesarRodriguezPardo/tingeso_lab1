@@ -8,12 +8,14 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import CalculationService from "../services/calculate.service"; // Asegúrate de importar los métodos de cálculo
+import creditService from "../services/credit.service";
 
 const CreditDetail = () => {
   const { id } = useParams();
   const [credit, setCredit] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [status, setStatus] = useState(credit?.status || null);
+  const [status, setStatus] = useState(null);
+  const [rejectedReason, setRejectedReason] = useState(null);
   const [payment, setPayment] = useState(null);
   const [insurance, setInsurance] = useState(null);
   const [administrationCost, setAdministrationCost] = useState(null);
@@ -26,6 +28,7 @@ const CreditDetail = () => {
         const response = await CreditService.getById(id);
         setCredit(response.data);
         setStatus(response.data.status); 
+        setRejectedReason(creditService.rejectedReason(id))
         const userResponse = await userService.getIdByRut(response.data.rut);
         setUserId(userResponse);
 
@@ -117,13 +120,14 @@ const CreditDetail = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <Paper elevation={3} sx={{ padding: 2 }}>
-        <Typography variant="h5">Detalles del Crédito</Typography>
-        <Typography variant="subtitle1"><strong>ID del Crédito:</strong> {credit.id}</Typography>
-        <Typography variant="subtitle1"><strong>Monto Solicitado:</strong> {credit.requestedAmount}</Typography>
-        <Typography variant="subtitle1"><strong>Término:</strong> {credit.requestedTerm} meses</Typography>
-        <Typography variant="subtitle1"><strong>Tasa de Interés:</strong> {credit.interestRate}%</Typography>
-        <Typography variant="subtitle1"><strong>Tipo de Crédito:</strong> {credit.type}</Typography>
-        <Typography variant="subtitle1"><strong>Estado:</strong> {credit.status}</Typography>
+        <Typography variant="h5">Details</Typography>
+        <Typography variant="subtitle1"><strong>Credit ID:</strong> {credit.id}</Typography>
+        <Typography variant="subtitle1"><strong>Requested amount:</strong> {credit.requestedAmount}</Typography>
+        <Typography variant="subtitle1"><strong>End:</strong> {credit.requestedTerm} meses</Typography>
+        <Typography variant="subtitle1"><strong>Interest:</strong> {credit.interestRate}%</Typography>
+        <Typography variant="subtitle1"><strong>Type:</strong> {credit.type}</Typography>
+        <Typography variant="subtitle1"><strong>Status:</strong> {credit.status}</Typography>
+        <Typography variant="subtitle1"><strong>Description:</strong> {credit.rejectedReason}</Typography>
 
         <div style={{ marginTop: "20px" }}>
           <select value={status} onChange={(e) => setStatus(e.target.value)} style={{ marginRight: '10px' }}>

@@ -25,6 +25,7 @@ const statusDescriptions = {
 
 const AllCreditList = () => {
   const [credits, setCredits] = useState([]);
+  const [rejectedReasons, setRejectedReasons] = useState({});  // Estado para almacenar las razones de rechazo
   const navigate = useNavigate();
 
   const init = () => {
@@ -33,12 +34,25 @@ const AllCreditList = () => {
       .then((response) => {
         console.log("Mostrando listado de todos los créditos.", response.data);
         setCredits(response.data);
+
+        // Obtener las razones de rechazo para cada crédito
+        response.data.forEach(credit => {
+          if (credit.status === 7) {  // Solo obtener la razón si el crédito está rechazado
+            CreditService.rejectedReason(credit.id)
+              .then((res) => {
+                setRejectedReasons(prevState => ({
+                  ...prevState,
+                  [credit.id]: res.data // Guardamos la razón con el ID del crédito
+                }));
+              })
+              .catch((error) => {
+                console.log("Error al obtener la razón de rechazo.", error);
+              });
+          }
+        });
       })
       .catch((error) => {
-        console.log(
-          "Se ha producido un error al intentar mostrar listado de créditos.",
-          error
-        );
+        console.log("Se ha producido un error al intentar mostrar listado de créditos.", error);
       });
   };
 
@@ -68,6 +82,9 @@ const AllCreditList = () => {
               Status
             </TableCell>
             <TableCell align="right" sx={{ fontWeight: "bold" }}>
+              Description
+            </TableCell>
+            <TableCell align="right" sx={{ fontWeight: "bold" }}>
               Action
             </TableCell>
           </TableRow>
@@ -84,6 +101,13 @@ const AllCreditList = () => {
               <TableCell align="left">{credit.interestRate}</TableCell>
               <TableCell align="right">
                 {statusDescriptions[Number(credit.status)] || "Desconocido"} {/* Muestra la descripción del estado */}
+              </TableCell>
+              <TableCell align="right">
+                {credit.status === 7 && rejectedReasons[credit.id] ? (
+                  rejectedReasons[credit.id]  // Muestra la razón de rechazo si está disponible
+                ) : (
+                  "N/A"
+                )}
               </TableCell>
               <TableCell align="right">
                 <Button

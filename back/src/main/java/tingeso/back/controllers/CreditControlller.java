@@ -47,4 +47,9 @@ public class CreditControlller {
         creditService.setType(id, type);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/getRejectedReason/{id}")
+    ResponseEntity<String> getRejectedReason(@PathVariable Long id){
+        return ResponseEntity.ok().body(creditService.getRejectedReason(id));
+    }
 }
